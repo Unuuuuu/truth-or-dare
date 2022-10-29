@@ -25,13 +25,9 @@ const userSlice = createSlice({
       id: action.payload.id,
       nickname: action.payload.nickname,
     }),
-    signOut: () => ({
-      isInitialLoadCompleted: true,
-      isSignedIn: false,
-    }),
   },
 });
 
 export default userSlice;
 
-export const { signIn, signOut, completeInitialLoad } = userSlice.actions;
+export const { signIn, completeInitialLoad } = userSlice.actions;

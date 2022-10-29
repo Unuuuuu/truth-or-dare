@@ -31,7 +31,6 @@ const Home: React.FC = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     const { nickname } = values;
-    console.log(nickname);
     await signInAnonymously(auth)
       .then(({ user }) => {
         toast({
