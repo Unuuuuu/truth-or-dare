@@ -1,6 +1,6 @@
 import { Button, Box, useToast, Skeleton, Stack, Fade } from "@chakra-ui/react";
 import { onValue, ref } from "firebase/database";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateRoomModal from "../components/CreateRoomModal";
 import { useAppSelector } from "../redux/hooks";

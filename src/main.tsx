@@ -20,7 +20,7 @@ const theme = extendTheme({
   styles: {
     global: {
       html: {
-        height: "var(--chakra-vh)",
+        height: "full",
       },
     },
   },
