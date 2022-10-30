@@ -1,4 +1,4 @@
-import { Button, Box } from "@chakra-ui/react";
+import { Button, Box, useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
@@ -6,10 +6,17 @@ import { useAppSelector } from "../redux/hooks";
 const Lobby: React.FC = () => {
   const { isInitialLoadCompleted, isSignedIn } = useAppSelector((state) => state.user);
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     if (isInitialLoadCompleted && !isSignedIn) {
       navigate("/");
+      toast({
+        title: "You need to enter nickname.",
+        status: "warning",
+        position: "top",
+        duration: 1500,
+      });
     }
   }, [isInitialLoadCompleted, isSignedIn]);
 

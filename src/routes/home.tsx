@@ -75,7 +75,7 @@ const Home: React.FC = () => {
               <Input
                 placeholder="Nickname"
                 {...register("nickname", {
-                  required: "Nickname is required",
+                  required: "Nickname is required.",
                 })}
               />
             </FormControl>
