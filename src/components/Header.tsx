@@ -10,7 +10,7 @@ const Header = () => {
       <Heading fontFamily={"Cinzel"}>Truth or Dare</Heading>
       {user.isSignedIn && (
         <Flex gap={2}>
-          <Menu placement={"bottom-end"} offset={[0, 12]}>
+          <Menu placement={"bottom-end"} offset={[0, 12]} autoSelect={false}>
             <MenuButton as={Button} size={"xs"}>
               {user.nickname}
             </MenuButton>
