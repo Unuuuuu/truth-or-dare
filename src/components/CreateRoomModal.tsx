@@ -31,7 +31,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = (props) => {
     register,
     formState: { errors, isSubmitting },
   } = useForm<FieldValues>();
-  const userId = useAppSelector((state) => state.user.id);
+  const { id: userId, nickname: userNickname } = useAppSelector((state) => state.user);
 
   const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     const { name } = values;
@@ -40,6 +40,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = (props) => {
     const newRoomRef = push(roomsRef);
     await set(newRoomRef, {
       creatorId: userId,
+      creatorNickname: userNickname,
       name,
     });
   };
