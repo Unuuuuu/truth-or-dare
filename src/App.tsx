@@ -3,17 +3,17 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
-import { completeInitialLoad, signIn } from "./redux/userSlice";
+import { load, signIn } from "./redux/userSlice";
 import { auth } from "./utils/firebase";
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const isInitialLoadCompleted = useAppSelector((state) => state.user.isInitialLoadCompleted);
+  const isLoading = useAppSelector((state) => state.user.isLoading);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!isInitialLoadCompleted) {
-        dispatch(completeInitialLoad());
+      if (isLoading) {
+        dispatch(load());
       }
 
       if (user && user.displayName) {
@@ -27,12 +27,12 @@ const App: React.FC = () => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [isLoading]);
 
   return (
     <>
       <Outlet />
-      {!isInitialLoadCompleted && (
+      {isLoading && (
         <Portal>
           <Center pos={"absolute"} inset={"0px"} bg={"blackAlpha.300"}>
             <Spinner size={"xl"} thickness={"4px"} />

@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserState {
-  isInitialLoadCompleted: boolean;
+  isLoading: boolean;
   isSignedIn: boolean;
   id?: string;
   nickname?: string;
 }
 
 const initialUserState: UserState = {
-  isInitialLoadCompleted: false,
+  isLoading: true,
   isSignedIn: false,
 };
 
@@ -16,8 +16,8 @@ const userSlice = createSlice({
   name: "user",
   initialState: initialUserState,
   reducers: {
-    completeInitialLoad: (state) => {
-      state.isInitialLoadCompleted = true;
+    load: (state) => {
+      state.isLoading = false;
     },
     signIn: (state, action: PayloadAction<{ id: string; nickname: string }>) => ({
       ...state,
@@ -30,4 +30,4 @@ const userSlice = createSlice({
 
 export default userSlice;
 
-export const { signIn, completeInitialLoad } = userSlice.actions;
+export const { signIn, load } = userSlice.actions;

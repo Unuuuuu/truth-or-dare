@@ -1,7 +1,3 @@
-body {
-  position: static !important;
-}
-
 #root {
   inset: 0px;
   position: absolute;

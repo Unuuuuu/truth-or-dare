@@ -48,7 +48,7 @@ const Home: React.FC = () => {
       })
       .catch(() => {
         toast({
-          title: "Something went wrong.",
+          title: "Something went wrong",
           status: "error",
           position: "top",
           duration: 1500,
@@ -71,11 +71,11 @@ const Home: React.FC = () => {
         <Box flexBasis={328} w={"full"} maxW={320}>
           <Logo />
           <form onSubmit={handleSubmit(onSubmit, onError)}>
-            <FormControl mb={4} isInvalid={Object.keys(errors).length > 0}>
+            <FormControl mb={4} isInvalid={errors.nickname !== undefined}>
               <Input
                 placeholder="Nickname"
                 {...register("nickname", {
-                  required: "Nickname is required.",
+                  required: "Nickname is required",
                 })}
               />
             </FormControl>
@@ -90,3 +90,8 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
+/**
+ * TODO:
+ * - Add 404 page
+ */
