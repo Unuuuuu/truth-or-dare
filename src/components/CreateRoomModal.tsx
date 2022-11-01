@@ -12,10 +12,12 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
+  useToast,
 } from "@chakra-ui/react";
 import { push, ref, set } from "firebase/database";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 import { database } from "../utils/firebase";
 
@@ -25,6 +27,8 @@ interface FieldValues {
   name: string;
 }
 
+const FORM_ID = "create-room-form";
+
 const CreateRoomModal: React.FC<CreateRoomModalProps> = (props) => {
   const {
     handleSubmit,
@@ -32,6 +36,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = (props) => {
     formState: { errors, isSubmitting },
   } = useForm<FieldValues>();
   const { id: userId, nickname: userNickname } = useAppSelector((state) => state.user);
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     const { name } = values;
@@ -42,7 +48,23 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = (props) => {
       creatorId: userId,
       creatorNickname: userNickname,
       name,
-    });
+      users: {
+        [userId!]: {
+          nickname: userNickname,
+        },
+      },
+    })
+      .then(() => {
+        navigate(`/rooms/${newRoomRef.key}`);
+      })
+      .catch(() => {
+        toast({
+          title: "Something went wrong",
+          status: "error",
+          position: "top",
+          duration: 1500,
+        });
+      });
   };
 
   return (
@@ -52,7 +74,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = (props) => {
         <ModalHeader>Room</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <form id="create-room-form" onSubmit={handleSubmit(onSubmit)}>
+          <form id={FORM_ID} onSubmit={handleSubmit(onSubmit)}>
             <FormControl mb={4} isInvalid={errors.name !== undefined}>
               <FormLabel>Name</FormLabel>
               <Input
@@ -64,9 +86,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = (props) => {
             </FormControl>
           </form>
         </ModalBody>
-
         <ModalFooter>
-          <Button w={"full"} colorScheme="blue" form="create-room-form" type="submit" isLoading={isSubmitting}>
+          <Button w={"full"} colorScheme="blue" form={FORM_ID} type="submit" isLoading={isSubmitting}>
             Create
           </Button>
         </ModalFooter>

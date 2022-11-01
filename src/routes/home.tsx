@@ -68,7 +68,7 @@ const Home: React.FC = () => {
   return (
     <Container h={"full"} maxW={"container.sm"}>
       <Flex as={"main"} h={"full"} direction={"column"} justify={"center"} align={"center"}>
-        <Box flexBasis={328} w={"full"} maxW={320} py={8}>
+        <Box flexBasis={392} w={"full"} maxW={320} py={8}>
           <Logo />
           <form onSubmit={handleSubmit(onSubmit, onError)}>
             <FormControl mb={4} isInvalid={errors.nickname !== undefined}>

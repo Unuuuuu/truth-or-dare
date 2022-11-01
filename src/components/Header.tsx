@@ -1,4 +1,4 @@
-import { Button, Fade, Flex, Heading, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Button, Fade, Flex, Heading, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 
@@ -6,10 +6,12 @@ const Header = () => {
   const { isSignedIn, nickname } = useAppSelector((state) => state.user);
 
   return (
-    <Flex as={"header"} h={"64px"} align={"center"} justify={"space-between"}>
-      <Heading noOfLines={1} fontFamily={"Cinzel"} userSelect={"none"}>
-        Truth or Dare
-      </Heading>
+    <Flex as={"header"} h={16} align={"center"} justify={"space-between"}>
+      <Link to={"/lobby"}>
+        <Heading noOfLines={1} fontFamily={"Cinzel"} userSelect={"none"}>
+          Truth or Dare
+        </Heading>
+      </Link>
       {isSignedIn && (
         <Flex gap={2}>
           <Menu placement={"bottom-end"} offset={[0, 10]} autoSelect={false}>

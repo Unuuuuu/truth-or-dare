@@ -1,13 +1,17 @@
-import { Button, Box, useToast, Skeleton, Fade, Flex, Text } from "@chakra-ui/react";
+import { Button, Box, useToast, Skeleton, Fade, Flex, Text, Center } from "@chakra-ui/react";
 import { onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CreateRoomModal from "../components/CreateRoomModal";
 import { useAppSelector } from "../redux/hooks";
 import { database } from "../utils/firebase";
+import { RoomDataType } from "./room";
+import { ReactComponent as DoorOpenFill } from "../assets/door-open-fill.svg";
+import Main from "../components/Main";
+import Footer from "../components/Footer";
 
-interface Rooms {
-  [index: string]: { creatorId: string; creatorNickname: string; name: string };
+interface RoomsDataType {
+  [index: string]: RoomDataType;
 }
 
 const Lobby: React.FC = () => {
@@ -15,7 +19,7 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const [isCreateRoomModalOpened, setIsCreateRoomModalOpened] = useState(false);
-  const [rooms, setRooms] = useState<Rooms>({});
+  const [rooms, setRooms] = useState<RoomsDataType | null>(null);
   const [isRoomsLoading, setIsRoomsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,7 +39,7 @@ const Lobby: React.FC = () => {
       if (isRoomsLoading) {
         setIsRoomsLoading(false);
       }
-      const data = snapshot.val() ?? {};
+      const data = snapshot.val();
       setRooms(data);
     });
 
@@ -54,49 +58,53 @@ const Lobby: React.FC = () => {
 
   return (
     <>
-      <Box
-        as={"main"}
-        h={"calc(100% - 128px)"}
-        overflowY={"scroll"}
-        sx={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          ["::-webkit-scrollbar"]: {
-            display: "none",
-          },
-        }}
-      >
+      <Main h={"calc(100% - 128px)"}>
         {!isUserLoading && isRoomsLoading && (
           <Flex direction={"column"} gap={4}>
-            {[...Array(12)].map(() => (
-              <Skeleton borderRadius={"md"} height="80px" />
+            {[...Array(12).keys()].map((index) => (
+              <Skeleton key={index} borderRadius={"md"} height="80px" />
             ))}
           </Flex>
         )}
-        {!isRoomsLoading && Object.keys(rooms).length === 0 ? (
-          <div>empty</div>
-        ) : (
+        {!isUserLoading && !isRoomsLoading && rooms === null && (
+          <Center h={"full"}>
+            <Fade in={true}>
+              <Flex direction={"column"} align={"center"} color={"gray.500"} fill={"gray.700"}>
+                <DoorOpenFill width={"96px"} height={"96px"} />
+                <Text fontSize={"xl"} fontWeight={"medium"}>
+                  There are no rooms here!
+                </Text>
+                <Text fontSize={"md"} textAlign={"center"}>
+                  Start creating your room.
+                </Text>
+              </Flex>
+            </Fade>
+          </Center>
+        )}
+        {!isUserLoading && !isRoomsLoading && rooms !== null && (
           <Flex direction={"column"} gap={4}>
             {Object.entries(rooms).map(([roomId, room]) => (
               <Fade key={roomId} in={true}>
-                <Box w={"full"} p={4} bg={"gray.100"} boxShadow={"sm"} borderRadius={"md"}>
-                  <Text noOfLines={1} fontSize={"lg"} color={"gray.900"} fontWeight={"medium"}>
-                    {room.name}
-                  </Text>
-                  <Text noOfLines={1} fontSize={"sm"} color={"gray.600"}>
-                    {room.creatorNickname}
-                  </Text>
-                </Box>
+                <Link to={`/rooms/${roomId}`}>
+                  <Box w={"full"} p={4} bg={"bg.surface"} boxShadow={"dark"} borderRadius={"md"}>
+                    <Text noOfLines={1} fontSize={"lg"} fontWeight={"medium"}>
+                      {room.name}
+                    </Text>
+                    <Text noOfLines={1} fontSize={"sm"} color={"muted"}>
+                      {room.creatorNickname}
+                    </Text>
+                  </Box>
+                </Link>
               </Fade>
             ))}
           </Flex>
         )}
-      </Box>
-      <Box as={"footer"} py={3}>
+      </Main>
+      <Footer>
         <Button w={"full"} colorScheme={"teal"} onClick={handleCreateRoomButtonClick}>
           Create Room
         </Button>
-      </Box>
+      </Footer>
       <CreateRoomModal isOpen={isCreateRoomModalOpened} onClose={handleCreateRoomModalClose} />
     </>
   );
