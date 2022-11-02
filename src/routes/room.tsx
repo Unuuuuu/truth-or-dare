@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { database } from "../utils/firebase";
 import { useAppSelector } from "../redux/hooks";
-import { Box, Button, Flex, Progress, Skeleton, Tag, Text, useToast } from "@chakra-ui/react";
+import { Avatar, AvatarGroup, Box, Fade, Skeleton, Text, useToast } from "@chakra-ui/react";
 import Main from "../components/Main";
-import Footer from "../components/Footer";
+import { ReactComponent as VipCrownFill } from "../assets/vip-crown-fill.svg";
 
 export interface RoomDataType {
   creatorId: string;
@@ -66,7 +66,7 @@ const Room: React.FC = () => {
   }, [isUserLoading, isRoomLoading]);
 
   useEffect(() => {
-    if (isUserLoading) {
+    if (isUserLoading || isRoomLoading) {
       return;
     }
 
@@ -80,14 +80,59 @@ const Room: React.FC = () => {
 
       remove(ref(database, `rooms/${roomId}/users/${userId}`));
     };
-  }, [isUserLoading, room?.creatorId]);
+  }, [isUserLoading, isRoomLoading, userId, room?.creatorId]);
+
+  let users: [string, { nickname: string }][] = [];
+  let isUserIdIncluded = false;
+  if (room !== null && room.users !== undefined) {
+    const usersAsArray = Object.entries(room.users);
+    const creatorIndex = usersAsArray.findIndex(([userId]) => userId === room.creatorId);
+    users = [
+      usersAsArray[creatorIndex],
+      ...usersAsArray.slice(0, creatorIndex),
+      ...usersAsArray.slice(creatorIndex + 1),
+    ];
+
+    isUserIdIncluded = users.find(([userIdFromDatabase]) => userIdFromDatabase === userId) !== undefined;
+  }
 
   return (
-    <div>
-      <div>name: {room?.name}</div>
-      <div>creator nickname: {room?.creatorNickname}</div>
-      <div>users: {JSON.stringify(room?.users)}</div>
-    </div>
+    <Main h={"calc(100% - 64px)"}>
+      {!isUserLoading && (isRoomLoading || !isUserIdIncluded) && <Skeleton borderRadius={"md"} height="106px" />}
+      {!isUserLoading && !isRoomLoading && room !== null && isUserIdIncluded && (
+        <Fade in={true}>
+          <Box p={4} bg={"bg.surface"} boxShadow={"dark"} borderRadius={"md"}>
+            <Text mb={3} fontSize={"xl"} fontWeight={"medium"}>
+              {room.name}
+            </Text>
+            <AvatarGroup size="sm" spacing={"-0.5em"}>
+              {users.map(([userId, user]) => (
+                <Avatar key={userId} name={user.nickname} boxShadow={"dark"}>
+                  {userId === room.creatorId && (
+                    <Box
+                      position={"absolute"}
+                      top={"-6px"}
+                      left={"50%"}
+                      transform={"auto"}
+                      translateX={"-50%"}
+                      fill={"yellow.300"}
+                      sx={{
+                        svg: {
+                          width: 3,
+                          height: 3,
+                        },
+                      }}
+                    >
+                      <VipCrownFill />
+                    </Box>
+                  )}
+                </Avatar>
+              ))}
+            </AvatarGroup>
+          </Box>
+        </Fade>
+      )}
+    </Main>
   );
 };
 
