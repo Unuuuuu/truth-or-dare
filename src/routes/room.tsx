@@ -3,9 +3,27 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { database } from "../utils/firebase";
 import { useAppSelector } from "../redux/hooks";
-import { Avatar, AvatarGroup, Box, Fade, Skeleton, Text, useToast } from "@chakra-ui/react";
+import {
+  Avatar,
+  AvatarGroup,
+  Box,
+  Button,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Fade,
+  Flex,
+  Progress,
+  Skeleton,
+  Text,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
 import Main from "../components/Main";
-import { ReactComponent as VipCrownFill } from "../assets/vip-crown-fill.svg";
+import { ReactComponent as Crown } from "../assets/crown.svg";
 
 export interface RoomDataType {
   creatorId: string;
@@ -22,6 +40,7 @@ const Room: React.FC = () => {
   const { roomId } = useParams();
   const [room, setRoom] = useState<RoomDataType | null>(null);
   const [isRoomLoading, setIsRoomLoading] = useState(true);
+  const { isOpen: isDrawerOpened, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
 
   useEffect(() => {
     if (!isUserLoading && !isSignedIn) {
@@ -49,7 +68,7 @@ const Room: React.FC = () => {
       if (data === null) {
         navigate("/lobby");
         toast({
-          title: "There is no room",
+          title: "Room does not exist",
           status: "warning",
           position: "top",
           duration: 1500,
@@ -97,42 +116,63 @@ const Room: React.FC = () => {
   }
 
   return (
-    <Main h={"calc(100% - 64px)"}>
-      {!isUserLoading && (isRoomLoading || !isUserIdIncluded) && <Skeleton borderRadius={"md"} height="106px" />}
-      {!isUserLoading && !isRoomLoading && room !== null && isUserIdIncluded && (
-        <Fade in={true}>
-          <Box p={4} bg={"bg.surface"} boxShadow={"dark"} borderRadius={"md"}>
-            <Text mb={3} fontSize={"xl"} fontWeight={"medium"}>
-              {room.name}
-            </Text>
-            <AvatarGroup size="sm" spacing={"-0.5em"}>
-              {users.map(([userId, user]) => (
-                <Avatar key={userId} name={user.nickname} boxShadow={"dark"}>
-                  {userId === room.creatorId && (
-                    <Box
-                      position={"absolute"}
-                      top={"-6px"}
-                      left={"50%"}
-                      transform={"auto"}
-                      translateX={"-50%"}
-                      fill={"yellow.300"}
-                      sx={{
-                        svg: {
-                          width: 3,
-                          height: 3,
-                        },
-                      }}
-                    >
-                      <VipCrownFill />
-                    </Box>
-                  )}
-                </Avatar>
-              ))}
-            </AvatarGroup>
-          </Box>
-        </Fade>
-      )}
-    </Main>
+    <>
+      <Main h={"calc(100% - 64px)"}>
+        {!isUserLoading && (isRoomLoading || !isUserIdIncluded) && <Skeleton borderRadius={"md"} height="106px" />}
+        {!isUserLoading && !isRoomLoading && room !== null && isUserIdIncluded && (
+          <Fade in={true}>
+            <Box p={4} bg={"bg.surface"} boxShadow={"dark"} borderRadius={"md"}>
+              <Text mb={3} fontSize={"xl"} fontWeight={"medium"}>
+                {room.name}
+              </Text>
+              <AvatarGroup
+                size="sm"
+                max={5}
+                spacing={"-0.5em"}
+                userSelect={"none"}
+                cursor={"pointer"}
+                onClick={onDrawerOpen}
+              >
+                {users.map(([userId, user]) => (
+                  <Avatar key={userId} name={user.nickname}>
+                    {userId === room.creatorId && (
+                      <Box
+                        position={"absolute"}
+                        top={"-6px"}
+                        left={"50%"}
+                        transform={"auto"}
+                        translateX={"-50%"}
+                        fill={"yellow.400"}
+                        sx={{
+                          svg: {
+                            width: 3,
+                            height: 3,
+                          },
+                        }}
+                      >
+                        <Crown />
+                      </Box>
+                    )}
+                  </Avatar>
+                ))}
+              </AvatarGroup>
+            </Box>
+          </Fade>
+        )}
+      </Main>
+      <Drawer isOpen={isDrawerOpened} placement="right" onClose={onDrawerClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Users</DrawerHeader>
+          <DrawerBody>
+            {users.map(([_, user]) => (
+              <div>{user.nickname}</div>
+            ))}
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 };
 
